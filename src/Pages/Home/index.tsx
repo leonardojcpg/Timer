@@ -12,6 +12,7 @@ import {
   TaskInput,
   MinutesAmountInput,
 } from './styles'
+import { useState } from 'react'
 
 const newCycleFormValidationSchema = zod.object({
   task: zod.string().min(1, 'informe a tarefa'),
@@ -27,8 +28,18 @@ interface NewCycleFormData {
 } */
 type NewCycleFormData = zod.infer<typeof newCycleFormValidationSchema>
 
+interface Cycle {
+  id: string;
+  task: string;
+  minutesAmount: number;
+  isActive: boolean
+}
 // sempre saber quando escolher um formulario "Controled" ou "Uncontroled"
 export const Home = () => {
+  
+  const [cycles, setCycles] = useState<Cycle[]>([])
+  const [activeCycleId, setActiveCycleId] = useState<String | null>(null)
+
   const { register, handleSubmit, watch, reset } = useForm<NewCycleFormData>({
     resolver: zodResolver(newCycleFormValidationSchema),
     defaultValues: {
@@ -38,10 +49,19 @@ export const Home = () => {
   })
 
   const handleCreateNewCycle = (data: NewCycleFormData) => {
-    console.log(data)
+    const newCycle: Cycle = {
+      id: String(new Date().getTime()),
+      task: data.task,
+      minutesAmount: data.minutesAmount,  
+    }
+     // sempre que uma alteracao de estado depender do valor anterior,
+     // usamos uma arrow function.
+    setCycles((state) => [...cycles, newCycle])
+    setActiveCycleId(newCycle.id)
     reset()
   }
 
+  const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
   const task = watch('task')
   const isSubmitDisabled = !task
 
