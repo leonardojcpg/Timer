@@ -2,7 +2,7 @@ import { Play } from 'phosphor-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as zod from 'zod'
-
+import { differenceInSeconds } from 'date-fns'
 import {
   CountdownContainer,
   FormContainer,
@@ -12,7 +12,8 @@ import {
   TaskInput,
   MinutesAmountInput,
 } from './styles'
-import { useState } from 'react'
+
+import { useEffect, useState } from 'react'
 
 const newCycleFormValidationSchema = zod.object({
   task: zod.string().min(1, 'informe a tarefa'),
@@ -32,7 +33,7 @@ interface Cycle {
   id: string
   task: string
   minutesAmount: number
-  isActive: boolean
+  startDate: Date
 }
 // sempre saber quando escolher um formulario "Controled" ou "Uncontroled"
 export const Home = () => {
@@ -48,11 +49,24 @@ export const Home = () => {
     },
   })
 
+  const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
+
+  useEffect(() => {
+    if (activeCycle) {
+      setInterval(() => {
+        setAmountSecondsPassed(
+          differenceInSeconds(new Date(), activeCycle.startDate),
+        )
+      }, 1000)
+    }
+  }, [activeCycle])
+
   const handleCreateNewCycle = (data: NewCycleFormData) => {
     const newCycle: Cycle = {
       id: String(new Date().getTime()),
       task: data.task,
       minutesAmount: data.minutesAmount,
+      startDate: new Date(),
     }
     // sempre que uma alteracao de estado depender do valor anterior,
     // usamos uma arrow function.
@@ -61,7 +75,6 @@ export const Home = () => {
     reset()
   }
 
-  const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
   const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0
   const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0
 
