@@ -23,11 +23,7 @@ const newCycleFormValidationSchema = zod.object({
     .min(5, 'O ciclo precisa ser de no minimo 5min')
     .max(60, 'O ciclo precisa ter no máximo 60min'),
 })
-/* 
-interface NewCycleFormData {
-  task: string
-  minutesAmount: number
-} */
+
 type NewCycleFormData = zod.infer<typeof newCycleFormValidationSchema>
 
 interface Cycle {
@@ -36,7 +32,9 @@ interface Cycle {
   minutesAmount: number
   startDate: Date
   interruptedDate?: Date
+  finishedDate?: Date
 }
+
 // sempre saber quando escolher um formulario "Controled" ou "Uncontroled"
 export const Home = () => {
   const [cycles, setCycles] = useState<Cycle[]>([])
@@ -52,21 +50,38 @@ export const Home = () => {
   })
 
   const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
+  const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0
 
   useEffect(() => {
     let interval: number
     if (activeCycle) {
       interval = setInterval(() => {
-        setAmountSecondsPassed(
-          differenceInSeconds(new Date(), activeCycle.startDate),
+        const secondsDifference = differenceInSeconds(
+          new Date(),
+          activeCycle.startDate,
         )
+        if (secondsDifference >= totalSeconds) {
+          setCycles((state) =>
+            state.map((cycle) => {
+              if (cycle.id === activeCycle) {
+                return { ...cycle, finishedDate: new Date() }
+              } else {
+                return cycle
+              }
+            }),
+          )
+          setAmountSecondsPassed(totalSeconds)
+          clearInterval(interval)
+        } else {
+          setAmountSecondsPassed(secondsDifference)
+        }
       }, 1000)
     }
     // quando tivermos return no useEffect, usamos uma função.
     return () => {
       clearInterval(interval)
     }
-  }, [activeCycle])
+  }, [activeCycle, totalSeconds, activeCycleId])
 
   const handleCreateNewCycle = (data: NewCycleFormData) => {
     const id = String(new Date().getTime())
@@ -86,18 +101,18 @@ export const Home = () => {
   }
 
   const handleInterruptCycle = () => {
-    setCycles(cycles.map((cycle) => {
-      if (cycle.id === activeCycle){
-        return {...cycle, interruptedDate: new Date()}
-      } else {
-        return cycle
-      }
-    }),
+    setCycles((state) =>
+      cycles.map((cycle) => {
+        if (cycle.id === activeCycle) {
+          return { ...cycle, interruptedDate: new Date() }
+        } else {
+          return cycle
+        }
+      }),
     )
     setActiveCycleId(null)
   }
 
-  const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0
   const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0
 
   const minutesAmount = Math.floor(currentSeconds / 60)
