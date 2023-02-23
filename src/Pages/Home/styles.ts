@@ -108,3 +108,31 @@ export const StartCountdownButton = styled.button`
     cursor: not-allowed;
   }
 `
+
+export const StopCountdownButton = styled.button`
+  width: 100%;
+  border: none;
+  padding: 1rem;
+  border-radius: 8px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  gap: 0.5rem;
+  font-weight: bold;
+
+  cursor: pointer;
+  background: ${(props) => props.theme['red-500']};
+
+  color: ${(props) => props.theme['grey-100']};
+
+  &:hover {
+    background: ${(props) => props.theme['red-700']};
+  }
+
+  &:not(:disabled):hover {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+`
