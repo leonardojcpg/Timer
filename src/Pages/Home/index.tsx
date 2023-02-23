@@ -20,23 +20,35 @@ const newCycleFormValidationSchema = zod.object({
     .min(5, 'O ciclo precisa ser de no minimo 5min')
     .max(60, 'O ciclo precisa ter no máximo 60min'),
 })
+/* 
+interface NewCycleFormData {
+  task: string
+  minutesAmount: number
+} */
+type NewCycleFormData = zod.infer<typeof newCycleFormValidationSchema>
+
 // sempre saber quando escolher um formulario "Controled" ou "Uncontroled"
 export const Home = () => {
-  const { register, handleSubmit, watch } = useForm({
+  const { register, handleSubmit, watch, reset } = useForm<NewCycleFormData>({
     resolver: zodResolver(newCycleFormValidationSchema),
+    defaultValues: {
+      task: '',
+      minutesAmount: 0,
+    },
   })
 
-  const handleCreateNewCycle = (data: any) => {
+  const handleCreateNewCycle = (data: NewCycleFormData) => {
     console.log(data)
+    reset()
   }
+
   const task = watch('task')
   const isSubmitDisabled = !task
-  console.log(formState.errors)
 
   return (
     <HomeContainer>
-      <form action="">
-        <FormContainer onSubmit={handleSubmit(handleCreateNewCycle)}>
+      <form onSubmit={handleSubmit(handleCreateNewCycle)} action="">
+        <FormContainer>
           <label htmlFor="task">Vou trabalhar em</label>
           <TaskInput
             list="task-suggestion"
