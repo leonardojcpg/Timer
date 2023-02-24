@@ -104,7 +104,6 @@ export const Home = () => {
     setActiveCycleId(null)
   }
 
-
   const task = watch('task')
   const isSubmitDisabled = !task
 
@@ -120,8 +119,8 @@ export const Home = () => {
             setSecondsPassed,
           }}
         >
-          <FormProvider>
-            <NewCycleForm {...newCycleForm} />
+          <FormProvider {...newCycleForm}>
+            <NewCycleForm />
           </FormProvider>
           <Countdown />
         </CyclesContext.Provider>
