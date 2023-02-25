@@ -38,7 +38,7 @@ export const StartCountdownButton = styled.button`
 
   &:not(:disabled):hover {
     opacity: 0.7;
-    cursor: not-allowed;
+    cursor: pointer;
   }
 `
 
@@ -66,6 +66,6 @@ export const StopCountdownButton = styled.button`
 
   &:not(:disabled):hover {
     opacity: 0.7;
-    cursor: not-allowed;
+    cursor: pointer;
   }
 `

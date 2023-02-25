@@ -13,7 +13,6 @@ import { NewCycleForm } from './components/NewCycleForm'
 import { CyclesContext } from '../../context/CycleContext'
 
 // sempre saber quando escolher um formulario "Controled" ou "Uncontroled"
-
 export const Home = () => {
   const { activeCycle, createNewCycle, interruptCurrentCycle } =
     useContext(CyclesContext)
@@ -36,7 +35,12 @@ export const Home = () => {
     },
   })
 
-  const { handleSubmit, watch } = newCycleForm
+  const { handleSubmit, watch, reset } = newCycleForm
+
+  function handleCreateNewCycle(data: NewCycleFormData) {
+    createNewCycle(data)
+    reset()
+  }
 
   const task = watch('task')
   const isSubmitDisabled = !task
